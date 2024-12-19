@@ -1,6 +1,6 @@
-import fastify from 'fastify'
-import fastifyCors from '@fastify/cors'
-import jwt from '@fastify/jwt'
+import { fastify } from 'fastify'
+import { fastifyCors } from '@fastify/cors'
+import { fastifyJwt } from '@fastify/jwt'
 import {
   serializerCompiler,
   validatorCompiler,
@@ -17,7 +17,7 @@ app.register(fastifyCors, {
   origin: '*',
 })
 
-app.register(jwt, {
+app.register(fastifyJwt, {
   secret: env.JWT_SECRET,
 })
 
