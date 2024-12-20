@@ -9,6 +9,7 @@ import {
 import { env } from '@/env'
 import { createUserRoute } from './routes/create-user'
 import { authenticateRoute } from './routes/authenticate'
+import { protectedRoute } from './routes/protected'
 
 const app = fastify().withTypeProvider<ZodTypeProvider>()
 
@@ -21,11 +22,12 @@ app.register(fastifyCors, {
 
 app.register(fastifyJwt, {
   secret: env.JWT_SECRET,
-  sign: { expiresIn: '1h' },
+  sign: { expiresIn: '15m' },
 })
 
 app.register(createUserRoute)
 app.register(authenticateRoute)
+app.register(protectedRoute)
 
 app.listen({ port: 3333, host: '0.0.0.0' }).then(() => {
   console.log('HTTP server running!')
