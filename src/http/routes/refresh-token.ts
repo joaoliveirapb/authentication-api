@@ -17,7 +17,7 @@ export const refreshTokenRoute: FastifyPluginAsyncZod = async (app) => {
       const { refreshToken } = request.body
 
       if (!refreshToken) {
-        return reply.status(401).send({ message: 'Refresh token is missing' })
+        return reply.status(400).send({ message: 'Refresh token is missing' })
       }
 
       try {
@@ -35,8 +35,16 @@ export const refreshTokenRoute: FastifyPluginAsyncZod = async (app) => {
           })
         }
 
+        const user = await prisma.user.findUnique({
+          where: { id: tokenEntry.user_id },
+        })
+
+        if (!user) {
+          return reply.status(401).send({ message: 'User not found' })
+        }
+
         const token = app.jwt.sign({
-          user: { userId: tokenEntry.user_id },
+          user: { id: user.id, name: user.name, email: user.email },
         })
 
         return reply.status(200).send({ token })
