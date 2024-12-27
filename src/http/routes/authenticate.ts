@@ -2,6 +2,7 @@ import { FastifyPluginAsyncZod } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { compare } from 'bcryptjs'
+import dayjs from 'dayjs'
 
 export const authenticateRoute: FastifyPluginAsyncZod = async (app) => {
   app.post(
@@ -38,7 +39,24 @@ export const authenticateRoute: FastifyPluginAsyncZod = async (app) => {
         user: { id: user.id, name: user.name, email: user.email },
       })
 
-      return reply.status(200).send({ token })
+      const refreshTokenEntry = await prisma.refreshToken.upsert({
+        where: { user_id: user.id },
+        update: {
+          user_id: user.id,
+          expires_at: dayjs().add(7, 'days').toDate(),
+        },
+        create: {
+          user_id: user.id,
+          expires_at: dayjs().add(7, 'days').toDate(),
+        },
+      })
+
+      const refreshToken = app.jwt.sign(
+        { id: refreshTokenEntry.id },
+        { expiresIn: '7d' },
+      )
+
+      return reply.status(200).send({ token, refreshToken })
     }
   )
 }
