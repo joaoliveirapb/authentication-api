@@ -9,6 +9,7 @@ import {
 import { env } from '@/env'
 import { createUserRoute } from './routes/create-user'
 import { authenticateRoute } from './routes/authenticate'
+import { refreshTokenRoute } from './routes/refresh-token'
 import { protectedRoute } from './routes/protected'
 
 const app = fastify().withTypeProvider<ZodTypeProvider>()
@@ -27,6 +28,7 @@ app.register(fastifyJwt, {
 
 app.register(createUserRoute)
 app.register(authenticateRoute)
+app.register(refreshTokenRoute)
 app.register(protectedRoute)
 
 app.listen({ port: 3333, host: '0.0.0.0' }).then(() => {
