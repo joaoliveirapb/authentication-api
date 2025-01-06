@@ -2,6 +2,7 @@ import { FastifyPluginAsyncZod } from 'fastify-type-provider-zod'
 import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
 import { hash } from 'bcryptjs'
+import { sendWelcomeMail } from '@/lib/mailer'
 
 export const createUserRoute: FastifyPluginAsyncZod = async (app) => {
   app.post(
@@ -33,6 +34,8 @@ export const createUserRoute: FastifyPluginAsyncZod = async (app) => {
       await prisma.user.create({
         data: { name, email, password: passwordHash },
       })
+
+      sendWelcomeMail({ name, email })
 
       return reply.status(201).send()
     }
